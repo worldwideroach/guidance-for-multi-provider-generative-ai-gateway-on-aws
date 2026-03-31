@@ -44,6 +44,7 @@ app.add_middleware(
 LITELLM_ENDPOINT = "http://localhost:4000"
 LITELLM_CHAT = f"{LITELLM_ENDPOINT}/v1/chat/completions"
 
+print(f"AWS_PARTITION: {os.getenv('AWS_PARTITION', "aws")}")
 print(f"AWS_REGION: {os.getenv('AWS_REGION')}")
 print(f"AWS_DEFAULT_REGION: {os.getenv('AWS_DEFAULT_REGION')}")
 bedrock_client = boto3.client("bedrock-agent")
@@ -55,6 +56,7 @@ chat_sessions = None
 OKTA_ISSUER = os.environ.get("OKTA_ISSUER")
 OKTA_AUDIENCE = os.environ.get("OKTA_AUDIENCE")
 MASTER_KEY = os.environ.get("MASTER_KEY")
+AWS_PARTITION = os.environ.get("AWS_PARTITION", "aws")
 
 # Create a verifier instance for Access Tokens
 access_token_verifier = None
@@ -278,7 +280,7 @@ async def convert_bedrock_to_openai(
 ) -> Dict[str, Any]:
     prompt_variables = bedrock_request.get("promptVariables", {})
     final_prompt_text = None
-    if model_id.startswith("arn:aws:bedrock:"):
+    if model_id.startswith(f"arn:{AWS_PARTITION}:bedrock:"):
         prompt_id, prompt_version = parse_prompt_arn(model_id)
         if prompt_id:
             if prompt_version:
@@ -932,7 +934,7 @@ async def proxy_request(request: Request):
         model_id = data.get("model")
         prompt_variables = data.pop("promptVariables", {})
         final_prompt_text = None
-        if model_id and model_id.startswith("arn:aws:bedrock:"):
+        if model_id and model_id.startswith(f"arn:{AWS_PARTITION}:bedrock:"):
             prompt_id, prompt_version = parse_prompt_arn(model_id)
             if prompt_id:
                 if prompt_version:

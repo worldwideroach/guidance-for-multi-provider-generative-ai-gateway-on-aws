@@ -16,6 +16,9 @@ resource "aws_cloudformation_stack" "guidance_deployment_metrics" {
     STACK
 }
 
+# Look up current AWS partition
+data "aws_partition" "current" {}
+
 module "base" {
   source = "./modules/base"
   name = var.name
@@ -33,6 +36,7 @@ module "base" {
   redis_node_type = var.redis_node_type
   redis_num_cache_clusters = var.redis_num_cache_clusters
   use_route53 = var.use_route53
+  aws_partition = data.aws_partition.current.partition
 }
 
 module "ecs_cluster" {
@@ -101,6 +105,7 @@ module "ecs_cluster" {
   langfuse_public_key = var.langfuse_public_key
   langfuse_secret_key = var.langfuse_secret_key
   langfuse_host = var.langfuse_host
+  aws_partition = data.aws_partition.current.partition
 
   depends_on = [ module.base ]
 }
@@ -197,6 +202,7 @@ module "eks_cluster" {
   langfuse_public_key = var.langfuse_public_key
   langfuse_secret_key = var.langfuse_secret_key
   langfuse_host = var.langfuse_host
+  aws_partition = data.aws_partition.current.partition
 
   depends_on = [ module.base ]
 }

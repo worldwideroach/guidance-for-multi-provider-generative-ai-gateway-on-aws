@@ -1,4 +1,6 @@
 
+# Look up current AWS partition
+data "aws_partition" "current" {}
 
 # Look up existing VPC
 data "aws_vpc" "imported_vpc" {
@@ -82,7 +84,7 @@ resource "aws_iam_role" "ec2_ssm_role" {
 # Attach SSM policy to the IAM role
 resource "aws_iam_role_policy_attachment" "ssm_policy_attachment" {
   role       = aws_iam_role.ec2_ssm_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  policy_arn = "arn:${data.aws_partition.current.partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 # Create an instance profile for the IAM role

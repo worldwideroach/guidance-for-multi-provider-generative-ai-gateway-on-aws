@@ -351,3 +351,9 @@ variable "langfuse_host" {
   type    = string
   description = "the hostname of your langfuse deployment."
 }
+
+variable "aws_partition" {
+  description = "AWS Partition"
+  type        = string
+  default     = "aws"
+}

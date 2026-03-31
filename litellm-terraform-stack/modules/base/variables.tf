@@ -80,3 +80,9 @@ variable "use_route53" {
   type        = bool
   default     = false
 }
+
+variable "aws_partition" {
+  description = "AWS Partition"
+  type        = string
+  default     = "aws"
+}

@@ -91,7 +91,7 @@ resource "aws_security_group_rule" "redis_ingress" {
 resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
   count = var.create_cluster ? 1 : 0
   role       = aws_iam_role.eks_cluster[0].name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  policy_arn = "arn:${var.aws_partition}:iam::aws:policy/AmazonEKSClusterPolicy"
 }
 
 
@@ -309,7 +309,7 @@ locals {
   
   role_name = split("/", data.aws_caller_identity.current.arn)[1]
   # Construct the appropriate ARN
-  principal_arn = local.is_assumed_role ? "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.role_name}" : data.aws_caller_identity.current.arn
+  principal_arn = local.is_assumed_role ? "arn:${var.aws_partition}:iam::${data.aws_caller_identity.current.account_id}:role/${local.role_name}" : data.aws_caller_identity.current.arn
 }
 
 
@@ -326,7 +326,7 @@ resource "aws_eks_access_policy_association" "admin_policy" {
   count = var.create_cluster ? 1 : 0
   cluster_name  = local.cluster_name
   principal_arn = aws_eks_access_entry.admin[0].principal_arn
-  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  policy_arn    = "arn:${var.aws_partition}:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
 
   access_scope {
     type = "cluster"

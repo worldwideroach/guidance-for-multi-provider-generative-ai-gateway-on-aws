@@ -15,7 +15,7 @@ data "aws_iam_policy_document" "assume_role" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      identifiers = ["arn:${var.aws_partition}:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
   }
 }
@@ -40,22 +40,22 @@ resource "aws_iam_role" "eks_nodegroup" {
 # Attach AWS-managed policies
 resource "aws_iam_role_policy_attachment" "eks_nodegroup_worker_policy" {
   role       = aws_iam_role.eks_nodegroup.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  policy_arn = "arn:${var.aws_partition}:iam::aws:policy/AmazonEKSWorkerNodePolicy"
 }
 
 resource "aws_iam_role_policy_attachment" "eks_nodegroup_cni_policy" {
   role       = aws_iam_role.eks_nodegroup.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  policy_arn = "arn:${var.aws_partition}:iam::aws:policy/AmazonEKS_CNI_Policy"
 }
 
 resource "aws_iam_role_policy_attachment" "eks_nodegroup_ec2_registry" {
   role       = aws_iam_role.eks_nodegroup.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  policy_arn = "arn:${var.aws_partition}:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
 resource "aws_iam_role_policy_attachment" "eks_nodegroup_ssm" {
   role       = aws_iam_role.eks_nodegroup.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  policy_arn = "arn:${var.aws_partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 data "aws_iam_policy_document" "nodegroup_ecr_ptc" {
@@ -152,7 +152,7 @@ resource "aws_iam_role_policy_attachment" "cw_agent_policy_attach" {
   count = var.create_cluster || var.install_add_ons_in_existing_eks_cluster ? 1 : 0
 
   role       = aws_iam_role.cw_observability_role[0].name
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  policy_arn = "arn:${var.aws_partition}:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
 data "aws_iam_policy_document" "eks_cluster_kms" {
